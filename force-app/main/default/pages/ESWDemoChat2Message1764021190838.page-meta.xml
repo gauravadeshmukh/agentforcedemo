@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ApexPage xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>58.0</apiVersion>
+    <availableInTouch>false</availableInTouch>
+    <confirmationTokenRequired>false</confirmationTokenRequired>
+    <description>Test Enhanced Web Chat page for Demo_Chat_2_Message embedded service deployment</description>
+    <label>ESWDemoChat2Message1764021190838</label>
+    <packageVersions>
+        <majorNumber>1</majorNumber>
+        <minorNumber>24</minorNumber>
+        <namespace>sf_chttr_apps</namespace>
+    </packageVersions>
+</ApexPage>

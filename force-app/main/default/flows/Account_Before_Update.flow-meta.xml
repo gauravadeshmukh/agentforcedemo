@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>60.0</apiVersion>
+    <description>Record-Triggered Flow: Before-save update on Account to set Type to Partner when empty. Implements INC0010002 Technical Approach.</description>
+    <environments>Default</environments>
+    <interviewLabel>Account : Before update</interviewLabel>
+    <label>Account_Before_Update</label>
+    <processType>Workflow</processType>
+    <start>
+        <locationX>50</locationX>
+        <locationY>50</locationY>
+        <connector>
+            <targetReference>Update_Account_Type</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Type</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+    </start>
+    <recordUpdates>
+        <name>Update_Account_Type</name>
+        <label>Update Account Type</label>
+        <locationX>250</locationX>
+        <locationY>50</locationY>
+        <inputAssignments>
+            <field>Type</field>
+            <value>
+                <stringValue>Partner</stringValue>
+            </value>
+        </inputAssignments>
+        <object>Account</object>
+    </recordUpdates>
+    <status>Active</status>
+</Flow>

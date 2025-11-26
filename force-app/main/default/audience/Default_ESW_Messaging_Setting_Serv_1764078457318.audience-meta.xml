@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Audience xmlns="http://soap.sforce.com/2006/04/metadata">
+    <audienceName>Default</audienceName>
+    <container>ESW_Messaging_Setting_Serv_1764078457318</container>
+    <criteria/>
+    <formulaFilterType>AllCriteriaMatch</formulaFilterType>
+    <isDefaultAudience>true</isDefaultAudience>
+</Audience>

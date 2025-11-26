@@ -1,0 +1,14 @@
+{
+  "required" : [ "body" ],
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "body" : {
+      "title" : "Body",
+      "description" : "input",
+      "lightning:type" : "@apexClassType/ExternalService__c__BedrockAgentWrapperService_input?isAuraEnabled=true",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}

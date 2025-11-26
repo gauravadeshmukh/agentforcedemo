@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ExternalServiceRegistration xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>BedrockAgentWrapperService</label>
+    <namedCredentialReference>BedrockAgentEndPoint</namedCredentialReference>
+    <operations>
+        <active>true</active>
+        <name>callx2dbedrockx2dagent</name>
+    </operations>
+    <registrationProviderType>Custom</registrationProviderType>
+    <schema>openapi: 3.0.0
+info:
+  title: Bedrock Agent Wrapper API
+  version: 1.0.0
+  description: Bedrock Agent Wrapper API
+paths:
+  /proxy:
+    post:
+      operationId: call-bedrock-agent
+      summary: Call Bedrock Agent
+      description: Call Bedrock Agent
+      requestBody:
+        description: input
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: &apos;#/components/schemas/input&apos;
+      responses:
+        &apos;200&apos;:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: &apos;#/components/schemas/output&apos;
+        &apos;500&apos;:
+          description: Server error 232
+components:
+  schemas:
+    input:
+      type: object
+      properties:
+        inputText:
+          type: string
+        agentId:
+          type: string
+        agentAlias:
+          type: string
+    output:
+      type: object
+      properties:
+        outputText:
+          type: string</schema>
+    <schemaType>OpenApi3</schemaType>
+    <schemaUploadFileExtension>yaml</schemaUploadFileExtension>
+    <schemaUploadFileName>openapi 3.0.0</schemaUploadFileName>
+    <serviceBinding>{&quot;host&quot;:&quot;&quot;,&quot;basePath&quot;:&quot;/&quot;,&quot;allowedSchemes&quot;:[],&quot;requestMediaTypes&quot;:[],&quot;responseMediaTypes&quot;:[],&quot;compatibleMediaTypes&quot;:{},&quot;extensions&quot;:{}}</serviceBinding>
+    <status>Complete</status>
+    <systemVersion>8</systemVersion>
+</ExternalServiceRegistration>

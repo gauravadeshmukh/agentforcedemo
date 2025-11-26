@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DigitalExperienceConfig xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>ESW_Chatbot_Message_Sample_1764020967237</label>
+    <site>
+        <urlPathPrefix>ESWChatbotMessageSample1764020967237</urlPathPrefix>
+    </site>
+    <space>site/ESW_Chatbot_Message_Sample_17640209672371</space>
+</DigitalExperienceConfig>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Queue xmlns="http://soap.sforce.com/2006/04/metadata">
+    <doesSendEmailToMembers>false</doesSendEmailToMembers>
+    <name>NewDemoQueue</name>
+    <queueMembers>
+        <users>
+            <user>deshmukhgaurava127@agentforce.com</user>
+            <user>integration@00dg5000000qdodea4.com</user>
+            <user>epic.01505f0e4dd4@orgfarm.salesforce.com</user>
+        </users>
+    </queueMembers>
+    <queueRoutingConfig>NewDemoChatBotMessage</queueRoutingConfig>
+    <queueSobject>
+        <sobjectType>MessagingSession</sobjectType>
+    </queueSobject>
+</Queue>

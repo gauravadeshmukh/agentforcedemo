@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ConversationMessageDefinition xmlns="http://soap.sforce.com/2006/04/metadata">
+    <constants>
+        <compositeValues>
+            <constantItems>
+                <constantType>Title</constantType>
+                <primitiveValues>
+                    <textValue>Order</textValue>
+                    <type>Text</type>
+                </primitiveValues>
+            </constantItems>
+            <identifier>627eb776-5d63-1195-b27d-b2b873df6133</identifier>
+        </compositeValues>
+        <compositeValues>
+            <constantItems>
+                <constantType>Title</constantType>
+                <primitiveValues>
+                    <textValue>Billing</textValue>
+                    <type>Text</type>
+                </primitiveValues>
+            </constantItems>
+            <identifier>58ce18db-0793-e776-833e-64de4f84cafc</identifier>
+        </compositeValues>
+        <compositeValues>
+            <constantItems>
+                <constantType>Title</constantType>
+                <primitiveValues>
+                    <textValue>Product</textValue>
+                    <type>Text</type>
+                </primitiveValues>
+            </constantItems>
+            <identifier>bff20fb6-f1e4-a101-d98b-9fed11531023</identifier>
+        </compositeValues>
+        <constantType>Options</constantType>
+    </constants>
+    <constants>
+        <constantType>Title</constantType>
+        <primitiveValues>
+            <textValue>What is your issue?</textValue>
+            <type>Text</type>
+        </primitiveValues>
+    </constants>
+    <label>Demo Service</label>
+    <language>en_US</language>
+    <messageLayouts>
+        <formatType>Text</formatType>
+        <layoutItems>
+            <collectionType>None</collectionType>
+            <name>text</name>
+            <primitiveValues>
+                <formulaTemplate>{!$Constants.Title}
+
+Select an option:
+
+{!$ListTemplates.OptionsList}</formulaTemplate>
+                <mergeFields>
+                    <formulaTemplate>{!$ListItem.Index}. {!$ListItem.Value.Title}{!BR()}</formulaTemplate>
+                    <mergeFieldType>ListTemplate</mergeFieldType>
+                    <name>OptionsList</name>
+                    <valueSourceReference>Constants.Options</valueSourceReference>
+                </mergeFields>
+                <type>FormulaTemplate</type>
+            </primitiveValues>
+        </layoutItems>
+        <messageType>StaticContent</messageType>
+    </messageLayouts>
+    <type>Picklist</type>
+</ConversationMessageDefinition>
