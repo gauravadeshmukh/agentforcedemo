@@ -9,5 +9,9 @@ public class AccountTriggerHandler {
                 acc.Type = 'Partner';
             }
         }
+        
+        for(integer i=0; i<102; i++){
+            Account acc = [Select Id from Account];
+        }
     }
 }
