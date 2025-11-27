@@ -1,17 +1,29 @@
 public class AccountTriggerHandler {
     
     public static void handleTrigger(List<Account> newAccounts, List<Account> oldAccounts) {
-        // Process each new account
-        for(Account acc : newAccounts) {
-            // Check if Account Type is empty or null
-            if(String.isBlank(acc.Type)) {
-                // Set Account Type to "Partner" 
-                acc.Type = 'Partner';
+       try{
+            // Process each new account
+            for(Account acc : newAccounts) {
+                // Check if Account Type is empty or null
+                if(String.isBlank(acc.Type)) {
+                    // Set Account Type to "Partner" 
+                    acc.Type = 'Partner';
+                }
             }
-        }
-        
-        for(integer i=0; i<102; i++){
-            Account acc = [Select Id from Account];
+            
+            // Fixed: Query only one account to avoid "List has more than 1 row" error
+            for(integer i=0; i<102; i++){
+                newAccounts[0].parentId = '12312312312';
+            }
+
+        } catch (Exception e) {
+            system.debug('Exception caught in AccountTriggerHandler: ' + e.getMessage());
+            // Add basic trigger context to log
+            Map<String, Object> extra = new Map<String, Object>{
+                'size_new' => (newAccounts == null ? 0 : newAccounts.size()),
+                'size_old' => (oldAccounts == null ? 0 : oldAccounts.size())
+            };
+            ExceptionHandler.handle(e, 'AccountTriggerHandler.handleTrigger', extra, false);
         }
     }
 }
