@@ -6,98 +6,21 @@ public with sharing class ExceptionHandler {
         handle(e, context, null, false);
     }
     public static void handle(Exception e, String context, Boolean rethrow) {
-        handle(e, context, null, rethrow);
+        log(e, context, null);
     }
     public static void handle(Exception e, String context, Map<String, Object> extra) {
-        handle(e, context, extra, false);
+        log(e, context, extra);
     }
     public static void handle(Exception e, String context, Map<String, Object> extra, Boolean rethrow) {
         // Build structured detail and log it
-        String detail = buildDetail(e, context, extra);
-        log(detail);
-
-        // Optionally rethrow a sanitized, consistent exception type
-        if (rethrow == true) {
-            String message = buildMessage(e, context);
-            AppHandledException ex = new AppHandledException(message);
-            // Preserve original stack trace reference in debug for traceability
-            System.debug(LoggingLevel.ERROR, 'EXC_ORIGINAL_STACK=' + e.getStackTraceString());
-            throw ex;
-        }
+    
+          log(e, context, extra);
+      
     }
 
-    // Returns a concise user-facing message that can be surfaced in UI or flows
-    public static String buildMessage(Exception e, String context) {
-        String base = 'An unexpected error occurred';
-        String ctx = String.isBlank(context) ? '' : ' while ' + context;
-        // Prefer e.getMessage(), fall back to type name
-        String msg = e != null && !String.isBlank(e.getMessage()) ? e.getMessage() : (e == null ? 'Unknown exception' : e.getTypeName());
-        return base + ctx + '. ' + 'Details: ' + msg;
-    }
 
-    // Returns a detailed technical payload (safe for logs, not for end users)
-    public static String buildDetail(Exception e, String context) {
-        return buildDetail(e, context, null);
-    }
-    public static String buildDetail(Exception e, String context, Map<String, Object> extra) {
-        if (e == null) {
-            return 'EXC| ts=' + DateTime.now().format('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'') +
-                   ' | context=' + safe(context) +
-                   ' | type=NULL | message=NULL | line=NULL | cause=NULL | stack=NULL' +
-                   buildExtra(extra);
-        }
-        Integer lineNumber;
-        try {
-            lineNumber = e.getLineNumber();
-        } catch (Exception ignore) {
-            lineNumber = null;
-        }
-        Exception cause;
-        try {
-            cause = e.getCause();
-        } catch (Exception ignore) {
-            cause = null;
-        }
-        String typeName = safe(e.getTypeName());
-        String message = safe(e.getMessage());
-        String stack = safe(e.getStackTraceString());
-        String causeType = cause == null ? '' : safe(cause.getTypeName());
-        String causeMsg = cause == null ? '' : safe(cause.getMessage());
 
-        String ts = DateTime.now().format('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');
-        String ctx = safe(context);
-
-        return 'EXC| ts=' + ts +
-               ' | context=' + ctx +
-               ' | type=' + typeName +
-               ' | message=' + message +
-               ' | line=' + (lineNumber == null ? '' : String.valueOf(lineNumber)) +
-               ' | causeType=' + causeType +
-               ' | causeMsg=' + causeMsg +
-               ' | stack=' + stack +
-               buildExtra(extra);
-    }
-
-    // Centralized logging: debug + persist to Application_Exception__c custom object
-    public static void log(String detail) {
-        System.debug(LoggingLevel.ERROR, '[ExceptionHandler] ' + detail);
-        // Best-effort persistence when called inside a transaction
-        try {
-            Application_Exception__c rec = new Application_Exception__c();
-            rec.Occurred_At__c = System.now();
-            rec.Message__c = detail; // store the whole detail payload for quick visibility
-            // Extra parsing is handled in the overload that has Exception/context/extra to populate discrete fields
-            insert rec;
-        } catch (Exception ignore) {
-            // Avoid recursive failures; log only
-            System.debug(LoggingLevel.ERROR, '[ExceptionHandler] Failed to persist detail to Application_Exception__c: ' + ignore.getMessage());
-        }
-    }
-    public static void log(Exception e, String context) {
-        log(e, context, null);
-    }
     public static void log(Exception e, String context, Map<String, Object> extra) {
-        System.debug(LoggingLevel.ERROR, '[ExceptionHandler] ' + buildDetail(e, context, extra));
         // Persist a structured record
         try {
             Integer lineNumber;
@@ -114,15 +37,8 @@ public with sharing class ExceptionHandler {
             rec.Cause_Type__c = cause == null ? '' : cause.getTypeName();
             rec.Cause_Message__c = cause == null ? '' : cause.getMessage();
             rec.Stack_Trace__c = e == null ? '' : e.getStackTraceString();
-
-            // Flatten extra map into string
-            if (extra != null && !extra.isEmpty()) {
-                List<String> kvs = new List<String>();
-                for (String k : extra.keySet()) {
-                    kvs.add(k + '=' + safe(extra.get(k)));
-                }
-                rec.Extra__c = String.join(kvs, ',');
-            }
+            rec.exception_message__c = formatExceptionForAI(e);
+           
             try { rec.User__c = UserInfo.getUserId(); } catch (Exception x) {}
 
             insert rec;
@@ -131,28 +47,42 @@ public with sharing class ExceptionHandler {
         }
     }
 
-    // Helper to append extra context map
-    private static String buildExtra(Map<String, Object> extra) {
-        if (extra == null || extra.isEmpty()) {
-            return '';
+
+    /**
+     * Captures and formats all relevant details of an Apex exception into a single string.
+     * This string can be used as the input for an AI analysis prompt.
+     *
+     * @param e The exception object caught in a try-catch block.
+     * @return A formatted string containing the error details.
+     */
+    public static String formatExceptionForAI(Exception e) {
+        String exceptionDetails = '### Input Data:\n';
+        
+        // 1. Get the primary message (e.g., specific DML error details)
+        exceptionDetails += '*   **Exception Message: ' + e.getMessage() + '\n';
+        
+        // 2. Get the specific line number where the error occurred
+        exceptionDetails += '*   **Line Number: ' + e.getLineNumber() + '\n';
+        
+        // 3. Get the type of exception (e.g., DmlException, LimitException)
+        exceptionDetails += '*   **Exception Type: `' + e.getTypeName() + '\n';
+
+        // 4. Get the full stack trace (essential for debugging the execution path)
+        // This often includes internal Salesforce method calls but helps pinpoint the origin.
+        String stackTrace = e.getStackTraceString();
+        if (stackTrace != null && stackTrace != '') {
+            // Escape any backticks that might exist in the stack trace itself if necessary for markdown formatting
+            stackTrace = stackTrace.replace('`', '\\`'); 
+            exceptionDetails += '*   **Stack Trace:\n \n' + stackTrace + '\n \n';
+        } else {
+            exceptionDetails += '*   **Stack Trace:** `Not available`\n';
         }
-        List<String> kvs = new List<String>();
-        for (String k : extra.keySet()) {
-            Object v = extra.get(k);
-            kvs.add(k + '=' + safe(v));
-        }
-        return ' | extra={' + String.join(kvs, ',') + '}';
+        
+        // Note: You would need to manually insert the 'Relevant Apex Code Snippet' into the prompt 
+        // as Apex cannot read its own source code dynamically.
+
+        return exceptionDetails;
     }
 
-    // Null-safe stringify and basic trimming for logs
-    private static String safe(Object o) {
-        if (o == null) return '';
-        String s = String.valueOf(o);
-        // Avoid gigantic log lines; trim to a reasonable length
-        Integer max = 10000;
-        if (s.length() > max) {
-            return s.substring(0, max) + '...TRUNCATED(' + (s.length() - max) + ')';
-        }
-        return s;
-        }
+
 }

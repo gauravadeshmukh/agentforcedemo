@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sf project deploy:*)",
+      "Bash(sf apex run:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

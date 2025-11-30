@@ -17,13 +17,18 @@ public class AccountTriggerHandler {
             }
 
         } catch (Exception e) {
-            system.debug('Exception caught in AccountTriggerHandler: ' + e.getMessage());
+            system.debug('Exception caught in getMessage: ' + e.getMessage());
+            system.debug('Exception caught in getStackTraceString: ' + e.getStackTraceString());
+            system.debug('Exception caught in LineNumber: ' + e.getLineNumber());
+
             // Add basic trigger context to log
             Map<String, Object> extra = new Map<String, Object>{
                 'size_new' => (newAccounts == null ? 0 : newAccounts.size()),
                 'size_old' => (oldAccounts == null ? 0 : oldAccounts.size())
             };
-            ExceptionHandler.handle(e, 'AccountTriggerHandler.handleTrigger', extra, false);
+            ExceptionHandler.handle(e, 'AccountTriggerHandler.handleTrigger', extra);
+
+            //newAccounts[0].addError(e.getStackTraceString()+' | '+e.getMessage()+' | Line: '+e.getLineNumber());
         }
     }
 }

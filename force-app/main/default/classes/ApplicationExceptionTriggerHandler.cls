@@ -22,7 +22,7 @@ public with sharing class ApplicationExceptionTriggerHandler {
 
         // Query with CreatedBy relationship
         List<Application_Exception__c> exceptionsWithUser = [
-            SELECT Id, Message__c, CreatedBy.Email, CreatedBy.Username
+            SELECT Id, Message__c, CreatedBy.Email, CreatedBy.Username, Exception_Message__c, Type__c
             FROM Application_Exception__c
             WHERE Id IN :exceptionIds
         ];
@@ -38,11 +38,12 @@ public with sharing class ApplicationExceptionTriggerHandler {
     private static void processExceptions(List<Application_Exception__c> exceptions) {
         for (Application_Exception__c appException : exceptions) {
             // Validate that Message field has a value
-            if (String.isNotBlank(appException.Message__c)) {
+            if (String.isNotBlank(appException.Exception_Message__c)) {
                 String caller = getCaller(appException);
 
                 // Make async API callout
-                IncidentAPICallout.createIncidentAsync(appException.Message__c, caller);
+                IncidentAPICallout.createIncidentAsync(appException.Exception_Message__c,
+                 appException.Message__c,appException.Type__c,caller);
             } else {
                 System.debug(LoggingLevel.WARN,
                     'Application Exception ' + appException.Id + ' has no message. Skipping API callout.');
@@ -56,7 +57,7 @@ public with sharing class ApplicationExceptionTriggerHandler {
      * @return String The caller email or username
      */
     private static String getCaller(Application_Exception__c appException) {
-        String caller = 'unknown@example.com';
+        String caller = 'admin@example.com';
 
         try {
             // Try to get CreatedBy user email

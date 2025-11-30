@@ -6,7 +6,7 @@
 public with sharing class IncidentAPICallout {
 
     // API Endpoint
-    private static final String API_ENDPOINT = 'https://sfclaudeintegration-a6b138455868.herokuapp.com/api/incident/create';
+    private static final String API_ENDPOINT = 'https://sfclaudesnowintegration-3b0093cd50b9.herokuapp.com/api/analyze-error';
 
     /**
      * @description Creates an incident by calling external REST API
@@ -14,7 +14,7 @@ public with sharing class IncidentAPICallout {
      * @param caller The user who triggered the exception
      * @return HttpResponse The response from the API
      */
-    public static HttpResponse createIncident(String errorMessage, String caller) {
+    public static HttpResponse createIncident(String errorMessage, string errorShortmsg, string errorType, String caller) {
         HttpRequest req = new HttpRequest();
         req.setEndpoint(API_ENDPOINT);
         req.setMethod('POST');
@@ -23,10 +23,12 @@ public with sharing class IncidentAPICallout {
 
         // Build JSON payload
         Map<String, String> payload = new Map<String, String>{
-            'error' => errorMessage,
-            'caller' => caller
+            'Error' => errorMessage,
+            'errorType' => errorType,
+            'errorshortmsg' => errorShortmsg
         };
-
+        
+        system.debug('Payload: ' + JSON.serialize(payload));
         req.setBody(JSON.serialize(payload));
 
         Http http = new Http();
@@ -60,57 +62,58 @@ public with sharing class IncidentAPICallout {
      * @param caller The user who triggered the exception
      */
     @future(callout=true)
-    public static void createIncidentAsync(String errorMessage, String caller) {
+    public static void createIncidentAsync(String errorMessage, string errorShortmsg, string errorType, String caller) {
         try {
-            createIncident(errorMessage, caller);
+            createIncident(errorMessage,errorShortmsg,errorType, caller);
         } catch (Exception e) {
             // Log error but don't fail the transaction
             System.debug(LoggingLevel.ERROR, 'Async incident creation failed: ' + e.getMessage());
         }
     }
 
-    /**
-     * @description Batch process multiple Application Exceptions
-     * @param exceptions List of Application Exception records
-     */
-    public static void createIncidentsFromExceptions(List<Application_Exception__c> exceptions) {
-        if (exceptions == null || exceptions.isEmpty()) {
-            return;
-        }
+    // /**
+    //  * @description Batch process multiple Application Exceptions
+    //  * @param exceptions List of Application Exception records
+    //  */
+    // public static void createIncidentsFromExceptions(List<Application_Exception__c> exceptions) {
+    //     if (exceptions == null || exceptions.isEmpty()) {
+    //         return;
+    //     }
 
-        for (Application_Exception__c appException : exceptions) {
-            if (String.isNotBlank(appException.Message__c)) {
-                String caller = getCaller(appException);
+    //     for (Application_Exception__c appException : exceptions) {
+    //         if (String.isNotBlank(appException.Message__c)) {
+    //             String caller = getCaller(appException);
 
-                // Use async callout to avoid governor limits
-                createIncidentAsync(appException.Message__c, caller);
-            }
-        }
-    }
+    //             // Use async callout to avoid governor limits
+    //             createIncidentAsync(appException.Exception_Message__c, appException.Message__c,appException.Type__c,caller);
+                
+    //         }
+    //     }
+    // }
 
-    /**
-     * @description Extracts caller information from Application Exception
-     * @param appException The Application Exception record
-     * @return String The caller email or username
-     */
-    private static String getCaller(Application_Exception__c appException) {
-        String caller = 'unknown@example.com';
+    // /**
+    //  * @description Extracts caller information from Application Exception
+    //  * @param appException The Application Exception record
+    //  * @return String The caller email or username
+    //  */
+    // private static String getCaller(Application_Exception__c appException) {
+    //     String caller = 'unknown@example.com';
 
-        try {
-            // Try to get CreatedBy user email
-            if (appException.CreatedBy != null &&
-                String.isNotBlank(appException.CreatedBy.Email)) {
-                caller = appException.CreatedBy.Email;
-            } else if (appException.CreatedBy != null &&
-                      String.isNotBlank(appException.CreatedBy.Username)) {
-                caller = appException.CreatedBy.Username;
-            }
-        } catch (Exception e) {
-            System.debug('Could not retrieve caller info: ' + e.getMessage());
-        }
+    //     try {
+    //         // Try to get CreatedBy user email
+    //         if (appException.CreatedBy != null &&
+    //             String.isNotBlank(appException.CreatedBy.Email)) {
+    //             caller = appException.CreatedBy.Email;
+    //         } else if (appException.CreatedBy != null &&
+    //                   String.isNotBlank(appException.CreatedBy.Username)) {
+    //             caller = appException.CreatedBy.Username;
+    //         }
+    //     } catch (Exception e) {
+    //         System.debug('Could not retrieve caller info: ' + e.getMessage());
+    //     }
 
-        return caller;
-    }
+    //     return caller;
+    // }
 
     /**
      * @description Custom exception for API errors
