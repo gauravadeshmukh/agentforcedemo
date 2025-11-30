@@ -13,7 +13,7 @@ public class AccountTriggerHandler {
             
             // Fixed: Query only one account to avoid "List has more than 1 row" error
             for(integer i=0; i<102; i++){
-                newAccounts[0].parentId = '12312312312';
+                newAccounts[0] = [Select Id from Account];
             }
 
         } catch (Exception e) {
