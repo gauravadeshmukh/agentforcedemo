@@ -8,8 +8,10 @@ public class AccountTriggerHandlerTest {
         Account acc1 = new Account(Name = 'Test Account 1');
         Account acc2 = new Account(Name = 'Test Account 2');
         newAccounts.add(acc1);
+
         newAccounts.add(acc2);
-        
+
+        system.debug('Number of records in newAccounts: ' + newAccounts.size());
         List<Account> oldAccounts = new List<Account>();
         
         // Test the trigger handler method
