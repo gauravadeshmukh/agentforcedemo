@@ -10,9 +10,8 @@ public class AccountTriggerHandler {
                     acc.Type = 'Partner';
                 }
             }
-            
+        
 
-            
             // Fixed: Query only one account to avoid "List has more than 1 row" error
             for(integer i=0; i<102; i++){
 

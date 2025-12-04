@@ -3,6 +3,7 @@ public class AccountTriggerHandlerTest {
     
     @isTest
     static void testHandleTriggerWithSqlLimitException() {
+        
         // Create test accounts
         List<Account> newAccounts = new List<Account>();
         Account acc1 = new Account(Name = 'Test Account 1');
