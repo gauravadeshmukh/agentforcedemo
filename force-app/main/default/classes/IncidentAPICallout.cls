@@ -6,9 +6,10 @@
 public with sharing class IncidentAPICallout {
 
     // API Endpoint
-    private static final String API_ENDPOINT = 'https://sfclaudesnowintegration-3b0093cd50b9.herokuapp.com/api/analyze-error';
-
-    /**
+    // Read from Custom Metadata: Heroku_Configuration__mdt (record name: HerokuAppAnalyzeErrorAPI)
+    // Ensure the field API_Endpoint__c exists on the CMDT. Adjust the field API name if different.
+    private static final String API_ENDPOINT = String.valueOf(Heroku_Configuration__mdt.getInstance('HerokuAppAnalyzeErrorAPI').Value__c);
+       /**
      * @description Creates an incident by calling external REST API
      * @param errorMessage The error message from Application Exception
      * @param caller The user who triggered the exception
