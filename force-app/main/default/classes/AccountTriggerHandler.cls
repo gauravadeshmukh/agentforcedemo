@@ -13,10 +13,10 @@ public class AccountTriggerHandler {
         
 
             // Fixed: Query only one account to avoid "List has more than 1 row" error
-            for(integer i=0; i<102; i++){
+            for(integer i=0; i<102; i++){ // Simulate a scenario that may cause SQL limit exception
 
-                newAccounts[0] = [Select Id from Account];
-            
+                newAccounts[0] = [Select Id from Account]; // Will throw exception in-case more than one record is returned.
+
             }
 
         } catch (Exception e) {
